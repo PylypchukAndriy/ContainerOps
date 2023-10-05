@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ContainerOps.Persistence\ContainerOps.Persistence.csproj" />
+    <ProjectReference Include="..\ContainerOps.Infrastructure\ContainerOps.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
