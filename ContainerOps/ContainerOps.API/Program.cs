@@ -1,3 +1,5 @@
+using ContainerOps.API.Endpoints;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
@@ -20,7 +22,7 @@ else
     app.UseHsts();
 }
 
-app.MapGet("/", () => "Hello World!");
+app.MapContainerEndpoints();
 
 app.UseHttpsRedirection();
 
