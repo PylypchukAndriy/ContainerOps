@@ -1,9 +1,12 @@
 using ContainerOps.API.Endpoints;
+using ContainerOps.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
