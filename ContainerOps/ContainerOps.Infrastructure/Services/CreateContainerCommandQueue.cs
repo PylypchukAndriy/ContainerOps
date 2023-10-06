@@ -31,6 +31,6 @@ internal sealed class CreateContainerCommandQueue : ICreateContainerCommandQueue
         return externalId;
     }
 
-    public ValueTask<(Guid ExternalId, string Image)> Dequeue(CancellationToken token = default) =>
-        _channel.Reader.ReadAsync(token);
+    public IAsyncEnumerable<(Guid ExternalId, string Image)> DequeueAll(CancellationToken token = default) =>
+         _channel.Reader.ReadAllAsync(token);
 }

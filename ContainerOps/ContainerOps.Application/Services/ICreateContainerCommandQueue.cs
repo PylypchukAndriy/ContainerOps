@@ -4,5 +4,5 @@ public interface ICreateContainerCommandQueue
 {
     ValueTask<Guid> Enqueue(string image, CancellationToken token = default);
 
-    ValueTask<(Guid ExternalId, string Image)> Dequeue(CancellationToken token = default);
+    IAsyncEnumerable<(Guid ExternalId, string Image)> DequeueAll(CancellationToken token = default);
 }
