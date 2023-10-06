@@ -13,6 +13,7 @@ public static class DependencyInjection
         services.Configure<ContainerSettings>(configuration.GetSection(ContainerSettings.Position));
 
         services.AddScoped<IContainerManager, ContainerManager>();
+        services.AddSingleton<IContainerMapper, ContainerMapper>();
 
         return services;
     }
