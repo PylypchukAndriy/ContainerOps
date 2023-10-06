@@ -2,11 +2,11 @@
 
 public interface IContainerManager : IDisposable
 {
-    Task<Guid> CreateAsync(Guid externalId, string image, CancellationToken token = default);
+    Task CreateAsync(Guid externalId, string image, CancellationToken token = default);
 
-    Task<bool> StartAsync(Guid externalId, CancellationToken token = default);
+    Task StartAsync(Guid externalId, CancellationToken token = default);
 
-    Task<bool> StopAsync(Guid externalId, CancellationToken token = default);
+    Task StopAsync(Guid externalId, CancellationToken token = default);
 
-    Task<Guid> DeleteAsync(Guid externalId, CancellationToken token = default);
+    Task DeleteAsync(Guid externalId, CancellationToken token = default);
 }

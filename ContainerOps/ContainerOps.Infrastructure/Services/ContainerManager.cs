@@ -21,7 +21,7 @@ internal sealed class ContainerManager : IContainerManager
         _client = new DockerClientConfiguration(new Uri(GetDockerApiUri())).CreateClient();
     }
 
-    public async Task<Guid> CreateAsync(Guid externalId, string image, CancellationToken token = default)
+    public async Task CreateAsync(Guid externalId, string image, CancellationToken token = default)
     {
         EnsureContainerUnmapped(externalId);
 
@@ -39,27 +39,25 @@ internal sealed class ContainerManager : IContainerManager
         }, token);
 
         _containerMapper.MapContainer(externalId, result.ID);
-
-        return externalId;
     }
 
-    public async Task<bool> StartAsync(Guid externalId, CancellationToken token = default)
+    public async Task StartAsync(Guid externalId, CancellationToken token = default)
     {
-        return await _client.Containers.StartContainerAsync(GetInternalId(externalId), null, token);
+        _ = await _client.Containers.StartContainerAsync(GetInternalId(externalId), null, token);
     }
 
-    public async Task<bool> StopAsync(Guid externalId, CancellationToken token = default)
+    public async Task StopAsync(Guid externalId, CancellationToken token = default)
     {
-        return await _client.Containers.StopContainerAsync(
-            GetInternalId(externalId),
-            new ContainerStopParameters
-            {
-                WaitBeforeKillSeconds = _containerSettings.CurrentValue.WaitBeforeKillSeconds,
-            },
-            token);
+        _ = await _client.Containers.StopContainerAsync(
+                GetInternalId(externalId),
+                new ContainerStopParameters
+                {
+                    WaitBeforeKillSeconds = _containerSettings.CurrentValue.WaitBeforeKillSeconds,
+                },
+                token);
     }
 
-    public async Task<Guid> DeleteAsync(Guid externalId, CancellationToken token = default)
+    public async Task DeleteAsync(Guid externalId, CancellationToken token = default)
     {
         await _client.Containers.RemoveContainerAsync(
             GetInternalId(externalId),
@@ -72,13 +70,12 @@ internal sealed class ContainerManager : IContainerManager
             token);
 
         _containerMapper.UnmapContainer(externalId);
-
-        return externalId;
     }
 
     public void Dispose() => _client.Dispose();
 
-    private void EnsureContainerUnmapped(Guid externalId) => _containerMapper.EnsureContainerUnmapped(externalId);
+    private void EnsureContainerUnmapped(Guid externalId) =>
+        _containerMapper.EnsureContainerUnmapped(externalId);
 
     private static void AppendTagIfMissing(ref string image) =>
         image = image.Contains(':') ? image : $"{image}:latest";
