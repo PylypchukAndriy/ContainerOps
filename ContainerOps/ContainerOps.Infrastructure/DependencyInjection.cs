@@ -15,7 +15,7 @@ public static class DependencyInjection
 
         services.AddScoped<IContainerManager, ContainerManager>();
         services.AddSingleton<IContainerMapper, ContainerMapper>();
-        services.AddSingleton<ICreateContainerCommandQueue, CreateContainerCommandQueue>();
+        services.AddSingleton<IContainerCommandQueue, ContainerCommandQueue>();
 
         return services;
     }
