@@ -16,6 +16,13 @@ internal sealed class ContainerStateManager : IContainerStateManager
         return container.InternalId;
     }
 
+    public string GetContainerStatus(Guid externalId)
+    {
+        Container container = GetOrThrowNotFound(externalId);
+
+        return container.Status.ToString();
+    }
+
     public void AddCreatedContainer(Guid externalId, string internalId)
     {
         EnsureOfContainerAbsence(externalId);
