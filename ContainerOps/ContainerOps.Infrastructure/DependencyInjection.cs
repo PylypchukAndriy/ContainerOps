@@ -16,7 +16,7 @@ public static class DependencyInjection
 
         services
             .AddSingleton<IContainerManager, ContainerManager>()
-            .AddSingleton<IContainerMapper, ContainerMapper>()
+            .AddSingleton<IContainerStateManager, ContainerStateManager>()
             .AddSingleton<IContainerCommandQueue, ContainerCommandQueue>();
 
         return services;

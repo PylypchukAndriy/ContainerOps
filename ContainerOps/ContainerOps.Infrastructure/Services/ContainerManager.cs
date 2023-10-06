@@ -11,19 +11,21 @@ internal sealed class ContainerManager : IContainerManager
 {
     private readonly DockerClient _client;
     private readonly IOptionsMonitor<ContainerSettings> _containerSettings;
-    private readonly IContainerMapper _containerMapper;
+    private readonly IContainerStateManager _containerStateManager;
 
-    public ContainerManager(IOptionsMonitor<ContainerSettings> containerSettings, IContainerMapper containerMapper)
+    public ContainerManager(
+        IOptionsMonitor<ContainerSettings> containerSettings,
+        IContainerStateManager containerStateManager)
     {
         _containerSettings = containerSettings;
-        _containerMapper = containerMapper;
+        _containerStateManager = containerStateManager;
 
         _client = new DockerClientConfiguration(new Uri(GetDockerApiUri())).CreateClient();
     }
 
     public async Task CreateAsync(Guid externalId, string image, CancellationToken token = default)
     {
-        EnsureContainerUnmapped(externalId);
+        EnsureOfContainerAbsence(externalId);
 
         AppendTagIfMissing(ref image);
 
@@ -38,23 +40,32 @@ internal sealed class ContainerManager : IContainerManager
             }
         }, token);
 
-        _containerMapper.MapContainer(externalId, result.ID);
+        _containerStateManager.AddCreatedContainer(externalId, result.ID);
     }
 
     public async Task StartAsync(Guid externalId, CancellationToken token = default)
     {
-        _ = await _client.Containers.StartContainerAsync(GetInternalId(externalId), null, token);
+        bool started = await _client.Containers.StartContainerAsync(GetInternalId(externalId), null, token);
+        if (started)
+        {
+            _containerStateManager.ChangeContainerStatusToStarted(externalId);
+        }
     }
 
     public async Task StopAsync(Guid externalId, CancellationToken token = default)
     {
-        _ = await _client.Containers.StopContainerAsync(
+        bool stopped = await _client.Containers.StopContainerAsync(
                 GetInternalId(externalId),
                 new ContainerStopParameters
                 {
                     WaitBeforeKillSeconds = _containerSettings.CurrentValue.WaitBeforeKillSeconds,
                 },
                 token);
+
+        if (stopped)
+        {
+            _containerStateManager.ChangeContainerStatusToStopped(externalId);
+        }
     }
 
     public async Task DeleteAsync(Guid externalId, CancellationToken token = default)
@@ -69,13 +80,13 @@ internal sealed class ContainerManager : IContainerManager
             },
             token);
 
-        _containerMapper.UnmapContainer(externalId);
+        _containerStateManager.DeleteContainer(externalId);
     }
 
     public void Dispose() => _client.Dispose();
 
-    private void EnsureContainerUnmapped(Guid externalId) =>
-        _containerMapper.EnsureContainerUnmapped(externalId);
+    private void EnsureOfContainerAbsence(Guid externalId) =>
+        _containerStateManager.EnsureOfContainerAbsence(externalId);
 
     private static void AppendTagIfMissing(ref string image) =>
         image = image.Contains(':') ? image : $"{image}:latest";
@@ -92,7 +103,8 @@ internal sealed class ContainerManager : IContainerManager
             token);
     }
 
-    private string GetInternalId(Guid externalId) => _containerMapper.GetInternalId(externalId);
+    private string GetInternalId(Guid externalId) =>
+        _containerStateManager.GetContainerInternalId(externalId);
 
     private static string GetDockerApiUri()
     {
