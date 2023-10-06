@@ -10,12 +10,14 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<ContainerSettings>(configuration.GetSection(ContainerSettings.Position))
+        services
+            .Configure<ContainerSettings>(configuration.GetSection(ContainerSettings.Position))
             .Configure<ChannelSettings>(configuration.GetSection(ChannelSettings.Position));
 
-        services.AddScoped<IContainerManager, ContainerManager>();
-        services.AddSingleton<IContainerMapper, ContainerMapper>();
-        services.AddSingleton<IContainerCommandQueue, ContainerCommandQueue>();
+        services
+            .AddSingleton<IContainerManager, ContainerManager>()
+            .AddSingleton<IContainerMapper, ContainerMapper>()
+            .AddSingleton<IContainerCommandQueue, ContainerCommandQueue>();
 
         return services;
     }
