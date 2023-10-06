@@ -1,3 +1,4 @@
+using ContainerOps.API;
 using ContainerOps.API.Endpoints;
 using ContainerOps.Infrastructure;
 
@@ -7,6 +8,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddHostedService<ContainerCommandWorker>();
 
 var app = builder.Build();
 
