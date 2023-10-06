@@ -42,7 +42,7 @@ internal sealed class ContainerStateManager : IContainerStateManager
         container.Status = ContainerStatus.Stopped;
     }
 
-    public void DeleteContainer(Guid externalId) => _map.Keys.Remove(externalId);
+    public void DeleteContainer(Guid externalId) => _map.Remove(externalId, out _);
 
     public void EnsureOfContainerAbsence(Guid externalId)
     {
